@@ -1,0 +1,60 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false # disable auto pushing of rebuilt image to docker hub 
+  artifacts:
+    - image: liangfuski/client
+      context: client
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: 'src/**/*.js'   # if we change the js file inside client/src, skaffold will directly throw them into the pod. 
+                                 # Any change of file other than js file, image liangfuski/client when be rebuilt according to
+                                 # client/Dockerfile. eg. change in package where we need npm install again
+            dest: .
+    - image: liangfuski/comments
+      context: client
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: '*.js'   
+            dest: .
+    - image: liangfuski/event-bus
+      context: event-bus
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: '*.js'   
+            dest: .
+    - image: liangfuski/moderation
+      context: moderation
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: '*.js'   
+            dest: .
+    - image: liangfuski/posts
+      context: posts
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: '*.js'   
+            dest: .
+    - image: liangfuski/query
+      context: query
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: '*.js'   
+            dest: .
